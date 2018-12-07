@@ -8,7 +8,7 @@ public struct Template {
     public let name: String
     public var data: String
 
-    public func rendering(with vars: [String:String]) -> String {
+    public func rendering(in layout: Template? = nil, with vars: [String:String]) -> String {
         var renderedData = [Character]()
         var held = false
         var prev: Character?
@@ -46,7 +46,13 @@ public struct Template {
             }
         }
 
-        return String(renderedData)
+        var templateString = String(renderedData)
+
+        if let layout = layout {
+            templateString = layout.data.replacingOccurrences(of: "{{render}}", with: templateString)
+        }
+
+        return templateString
     }
 }
 

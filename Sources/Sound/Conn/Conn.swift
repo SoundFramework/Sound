@@ -10,6 +10,7 @@ open class Conn {
     public var reqHead: HTTPRequestHead
     public var path: Path
     public var reqBody: String?
+    public var layout_template: String?
 
     private let methodOverrides: [String:HTTPMethod] = ["PATCH": .PATCH, "PUT": .PUT, "DELETE": .DELETE]
 
@@ -143,8 +144,14 @@ open class Conn {
             return app!.serverError(self, [:])
         }
 
-        let html = template.rendering(with: vars)
-        return self.html(html)
+        var layout: Template?
+        if let layout_template = self.layout_template {
+            layout = app!.templates[layout_template + ".tmpl"]
+        }
+
+        let html = template.rendering(in: layout, with: vars)
+
+        self.html(html)
     }
 
     public func sendFile(status: HTTPResponseStatus = .ok, _ path: String, safe: Bool = true) {
