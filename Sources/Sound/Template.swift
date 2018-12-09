@@ -8,6 +8,8 @@ public struct Template {
     public let name: String
     public var data: String
 
+    private let unsafe = "unsafe_html:"
+
     public func rendering(in layout: Template? = nil, with vars: [String:String]) -> String {
         var renderedData = [Character]()
         var held = false
@@ -39,7 +41,13 @@ public struct Template {
             } else if c == ")" {
                 let key = String(keyChars)
                 keyChars = [Character]()
-                renderedData += vars[key]?.addingHTMLEncoding() ?? vars["unsafe_html:\(key)"]!
+
+                if key.hasPrefix(unsafe) {
+                    renderedData += vars[String(key.dropFirst(unsafe.count))]!
+                } else {
+                    renderedData += vars[key]!.addingHTMLEncoding()
+                }
+
                 held = false
             } else {
                 keyChars.append(c)
