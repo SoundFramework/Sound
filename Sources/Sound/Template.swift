@@ -39,7 +39,7 @@ public struct Template {
             } else if c == ")" {
                 let key = String(keyChars)
                 keyChars = [Character]()
-                renderedData += vars[key]!.addingHTMLEncoding()
+                renderedData += vars[key]?.addingHTMLEncoding() ?? vars["unsafe_html:\(key)"]!
                 held = false
             } else {
                 keyChars.append(c)
