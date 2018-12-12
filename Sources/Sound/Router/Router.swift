@@ -6,7 +6,7 @@ import NIO
 import NIOHTTP1
 import Foundation
 
-public typealias Handler = (_ conn: Conn, _ params: [String:String]) -> Void
+public typealias Handler = (_ conn: Conn, _ params: [String:String]) throws -> Void
 public typealias Pipe = (Conn) -> Void
 public typealias Route = (pipes: [Pipe], handler: Handler)
 
@@ -62,13 +62,19 @@ open class Router {
         if let (handler, params) = self.routes.fetch(conn.method, conn.path) {
             conn.pathParams = params
 
-            handler.pipes.forEach { pipe in
+            for pipe in handler.pipes {
+                guard conn.state != .halted else { continue }
                 pipe(conn)
             }
 
-            handler.handler(conn, conn.params)
+            do {
+                try handler.handler(conn, conn.params)
+            } catch {
+                try! self.serverError(conn, conn.params)
+            }
+
         } else {
-            notFound(conn, conn.params)
+            try! notFound(conn, conn.params)
         }
 
         print("\(conn.method) \(conn.uri) - \(conn.respStatus) - \(conn.params)")

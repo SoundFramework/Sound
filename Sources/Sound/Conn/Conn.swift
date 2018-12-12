@@ -141,7 +141,7 @@ open class Conn {
 
     public func render(_ template: String, with vars: [String:String] = [String:String]()) {
         guard let template = app!.templates[template + ".tmpl"] else {
-            return app!.serverError(self, [:])
+            return try! app!.serverError(self, [:])
         }
 
         var layout: Template?
@@ -167,7 +167,7 @@ open class Conn {
         }
 
         guard ok, !path.hasSuffix("."), !path.hasSuffix("/") else {
-            self.app!.notFound(self, [:])
+            try! self.app!.notFound(self, [:])
             self.writeResp(forceIdle: true)
             return
         }
@@ -176,7 +176,7 @@ open class Conn {
         let fileHandleAndRegion = self.fileIO!.openFile(path: path, eventLoop: ctx!.eventLoop)
 
         fileHandleAndRegion.whenFailure { _ in
-            self.app!.notFound(self, [:])
+            try! self.app!.notFound(self, [:])
             self.writeResp(forceIdle: true)
         }
 
@@ -193,7 +193,7 @@ open class Conn {
         }
 
         guard let respBody = self.respBody else {
-            app!.serverError(self, [:])
+            try! app!.serverError(self, [:])
             writeResp()
             return
         }
