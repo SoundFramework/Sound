@@ -30,12 +30,25 @@ class SoundTests: XCTestCase {
         XCTAssertNil(app.routes.fetch(.GET, Path("/notfound")))
     }
 
+    func testQueryParams() {
+        var reqHead = HTTPRequestHead(version: HTTPVersion(major:1, minor:1), method: .GET, uri: "/sound?param=test&test=param")
+        var conn = Conn(reqHead: reqHead)
+
+        XCTAssertEqual(conn.queryParams, ["param": "test", "test": "param"])
+
+        reqHead = HTTPRequestHead(version: HTTPVersion(major:1, minor:1), method: .GET, uri: "/sound")
+        conn = Conn(reqHead: reqHead)
+
+        XCTAssertEqual(conn.queryParams, [:])
+    }
+
     func testHTMLEncoding() {
         XCTAssertEqual("<h1>Hello</h1>".addingHTMLEncoding(), "&lt;h1&gt;Hello&lt;/h1&gt;")
     }
 
     static var allTests = [
         ("testRouter", testRouter),
+        ("testQueryParams", testQueryParams),
         ("testHTMLEncoding", testHTMLEncoding),
         ("testHeaders", testHeaders),
     ]

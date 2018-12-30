@@ -222,11 +222,11 @@ open class Conn {
         self.ctx = ctx
         self.channel = ctx?.channel
         self.fileIO = fileIO
-
         self.reqHead = reqHead
-        var uriParts = reqHead.uri.split(separator: "?", maxSplits: 1)
-        self.path = Path(String(uriParts.removeFirst()))
-        self.queryParams = decodeQueryParams(uriParts.popLast())
+
+        let uri = URL(string: reqHead.uri)!
+        self.path = Path(uri.path)
+        self.queryParams = decodeQueryParams(uri.query)
     }
 }
 
