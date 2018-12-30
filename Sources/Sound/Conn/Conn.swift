@@ -102,25 +102,6 @@ open class Conn {
         }
     }
 
-    private func decodeQueryParams<T>(_ query: T?) -> [String:String] where T: StringProtocol {
-        var queryParams = [String:String]()
-
-        guard query != nil else {
-            return queryParams
-        }
-
-        guard let query = String(query!).removingPercentEncoding else {
-            return queryParams
-        }
-
-        query.split(separator: "&").forEach { queryParam in
-            var params = queryParam.split(separator: "=", maxSplits: 1).map { q in String(q) }
-            queryParams[params.removeFirst()] = params.popLast()
-        }
-
-        return queryParams
-    }
-
     private let app: Sound?
     private let fileIO: NonBlockingFileIO?
     private let ctx: ChannelHandlerContext?
