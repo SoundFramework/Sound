@@ -24,20 +24,9 @@ open class Router {
     }
 
     let staticHandler: Handler = { conn, params in
-        let fileManager = FileManager.default
-        let publicURL = URL(fileURLWithPath: "\(fileManager.currentDirectoryPath)/public/")
-        let filePath = URL(string: "\(params["file"]!)")
-        let fileNotFound = "404 - File Not Found."
-
-        guard let standardizedFilePath = filePath?.standardized else {
-            conn.text(status: .notFound, fileNotFound)
-            return
-        }
-
-        let fileURL = publicURL.appendingPathComponent(standardizedFilePath.relativeString, isDirectory: false)
-
+        let fileURL = URL(fileURLWithPath: "\(FileManager.default.currentDirectoryPath)/public/\(params["file"]!)")
         try! conn.addHeader(name: "Content-Type", value: fileURL.mimeType())
-        conn.sendFile(fileURL.relativePath, safe: false)
+        conn.sendFile(fileURL.relativePath, safe: true)
     }
 
     public func get(_ route: String, _ pipes: [Pipe] = [Pipe](), _ fun: @escaping Handler) {
