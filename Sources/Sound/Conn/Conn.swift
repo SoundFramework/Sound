@@ -146,6 +146,7 @@ open class Conn {
         if safe {
             let publicDirectory = FileManager.default.currentDirectoryPath + "/public/"
             fileURL = URL(fileURLWithPath: path).standardizedFileURL.absoluteString
+            print(fileURL)
             ok = fileURL.hasPrefix("file://\(publicDirectory)")
         }
 
