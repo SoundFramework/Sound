@@ -3,8 +3,8 @@
 //
 
 extension Conn {
-    func decodeQueryParams<T>(_ query: T?) -> [String:String] where T: StringProtocol {
-        var queryParams = [String:String]()
+    func decodeQueryParams<T>(_ query: T?) -> [String:Param] where T: StringProtocol {
+        var queryParams = [String:Param]()
 
         guard query != nil else {
             return queryParams
@@ -16,7 +16,11 @@ extension Conn {
 
         query.split(separator: "&").forEach { queryParam in
             var params = queryParam.split(separator: "=", maxSplits: 1).map { q in String(q) }
-            queryParams[params.removeFirst()] = params.popLast()
+
+            let k = params.removeFirst()
+            if let v = params.popLast() {
+                queryParams[k] = Param(v)
+            }
         }
 
         return queryParams

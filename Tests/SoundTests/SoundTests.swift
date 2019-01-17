@@ -34,12 +34,17 @@ class SoundTests: XCTestCase {
         var reqHead = HTTPRequestHead(version: HTTPVersion(major:1, minor:1), method: .GET, uri: "/sound?param=test&test=param")
         var conn = Conn(reqHead: reqHead)
 
-        XCTAssertEqual(conn.queryParams, ["param": "test", "test": "param"])
+        XCTAssertEqual(conn.queryParams, ["param": Param("test"), "test": Param("param")])
 
         reqHead = HTTPRequestHead(version: HTTPVersion(major:1, minor:1), method: .GET, uri: "/sound")
         conn = Conn(reqHead: reqHead)
 
-        XCTAssertEqual(conn.queryParams, [:])
+        XCTAssertEqual(conn.queryParams, [String:Param]())
+
+        reqHead = HTTPRequestHead(version: HTTPVersion(major:1, minor:1), method: .GET, uri: "/sound?param=test&test=param")
+        conn = Conn(reqHead: reqHead)
+
+        XCTAssertTrue(conn.queryParams["param"]! == "test")
     }
 
     func testHTMLEncoding() {

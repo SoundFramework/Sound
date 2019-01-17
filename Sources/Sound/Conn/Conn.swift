@@ -19,7 +19,7 @@ open class Conn {
 
         switch m {
         case .POST:
-            if let bodyParam = bodyParams["_method"] {
+            if let bodyParam = bodyParams["_method"]?.value as? String {
                 return methodOverrides[bodyParam] ?? .POST
             } else {
                 return .POST
@@ -39,12 +39,14 @@ open class Conn {
     }
 
     public var pathParams = [String:String]()
-    public var bodyParams = [String:String]()
-    public var queryParams = [String:String]()
+    public var bodyParams = [String:Param]()
+    public var queryParams = [String:Param]()
 
     // Technically would probably be better as a function b/c it is not O(1).
     // The API feels nicer this way though.
-    public var params: [String:String] {
+    public var params: [String:Param] {
+        let pathParams = self.pathParams.mapValues({ Param($0) })
+
         if self.method == .GET {
             return pathParams.merging(queryParams) { (current, _) in current }
         } else {

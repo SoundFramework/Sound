@@ -6,7 +6,7 @@ import NIO
 import NIOHTTP1
 import Foundation
 
-public typealias Handler = (_ conn: Conn, _ params: [String:String]) throws -> Void
+public typealias Handler = (_ conn: Conn, _ params: [String:Param]) throws -> Void
 public typealias Pipe = (Conn) -> Void
 public typealias Route = (pipes: [Pipe], handler: Handler)
 
@@ -26,7 +26,7 @@ open class Router {
     let staticHandler: Handler = { conn, params in
         let fileManager = FileManager.default
         let publicURL = URL(fileURLWithPath: "\(fileManager.currentDirectoryPath)/public/")
-        let filePath = URL(string: params["file"]!)
+        let filePath = URL(string: "\(params["file"]!)")
         let fileNotFound = "404 - File Not Found."
 
         guard let standardizedFilePath = filePath?.standardized else {
