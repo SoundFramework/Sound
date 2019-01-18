@@ -11,6 +11,15 @@ class SoundTests: XCTestCase {
         conn = Conn(reqHead: reqHead)
     }
 
+    func testStaticFileSafety() {
+        let currentDirectory = FileManager.default.currentDirectoryPath
+        var file = currentDirectory + "/../../../../../../../../etc/passwd"
+        XCTAssertNotEqual(file.normalizedSafeURLString(), file)
+
+        file = currentDirectory + "/public/etc/passwd"
+        XCTAssertEqual(file.normalizedSafeURLString(), file)
+    }
+
     func testHeaders() {
         XCTAssertNoThrow(try conn.addHeader(name: "Test", value: "Header"))
         XCTAssertThrowsError(try conn.addHeader(name: "Evil: Header", value: "Attempt"))
@@ -56,5 +65,6 @@ class SoundTests: XCTestCase {
         ("testQueryParams", testQueryParams),
         ("testHTMLEncoding", testHTMLEncoding),
         ("testHeaders", testHeaders),
+        ("testStaticFileSafety", testStaticFileSafety),
     ]
 }

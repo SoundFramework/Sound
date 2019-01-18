@@ -139,24 +139,20 @@ open class Conn {
 
     public func sendFile(status: HTTPResponseStatus = .ok, _ path: String, safe: Bool = true) {
         self.state = .busy
-
-        var ok = true
         var fileURL = path
 
         if safe {
-            let publicDirectory = FileManager.default.currentDirectoryPath + "/public/"
-            fileURL = URL(fileURLWithPath: path).standardizedFileURL.absoluteString
-            ok = fileURL.hasPrefix("file://\(publicDirectory)")
+            fileURL = path.normalizedSafeURLString()
         }
 
-        guard ok, !path.hasSuffix("."), !path.hasSuffix("/") else {
+        guard fileURL != "", !fileURL.hasSuffix("."), !fileURL.hasSuffix("/") else {
             try! self.app!.notFound(self, [:])
             self.writeResp(forceIdle: true)
             return
         }
 
         self.respStatus = status
-        let fileHandleAndRegion = self.fileIO!.openFile(path: path, eventLoop: ctx!.eventLoop)
+        let fileHandleAndRegion = self.fileIO!.openFile(path: fileURL, eventLoop: ctx!.eventLoop)
 
         fileHandleAndRegion.whenFailure { _ in
             try! self.app!.notFound(self, [:])
