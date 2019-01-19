@@ -10,7 +10,8 @@ extension String {
         let fileURL = URL(fileURLWithPath: self).standardizedFileURL
                 .absoluteString
                 .dropFirst("file://".count)
+        let fileURLString = String(fileURL)
 
-        return fileURL.hasPrefix(publicDirectory) ? String(fileURL) : ""
+        return fileURLString.hasPrefix(publicDirectory) ? fileURLString : ""
     }
 }
