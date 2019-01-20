@@ -53,7 +53,7 @@ extension Dictionary: Paramable where Value: Equatable {
 }
 
 public class Param: Equatable, CustomStringConvertible {
-    let value: Paramable
+    public let value: Paramable
 
     public var description: String {
         return "\(self.value)"
