@@ -43,17 +43,32 @@ class SoundTests: XCTestCase {
         var reqHead = HTTPRequestHead(version: HTTPVersion(major:1, minor:1), method: .GET, uri: "/sound?param=test&test=param")
         var conn = Conn(reqHead: reqHead)
 
-        XCTAssertEqual(conn.queryParams, ["param": Param("test"), "test": Param("param")])
+        var params = ["param": Param("test"), "test": Param("param")]
+        XCTAssertEqual(conn.queryParams, params)
 
         reqHead = HTTPRequestHead(version: HTTPVersion(major:1, minor:1), method: .GET, uri: "/sound")
         conn = Conn(reqHead: reqHead)
 
-        XCTAssertEqual(conn.queryParams, [String:Param]())
+        params = [String:Param]()
+        XCTAssertEqual(conn.queryParams, params)
 
         reqHead = HTTPRequestHead(version: HTTPVersion(major:1, minor:1), method: .GET, uri: "/sound?param=test&test=param")
         conn = Conn(reqHead: reqHead)
 
         XCTAssertTrue(conn.queryParams["param"]! == "test")
+
+        reqHead = HTTPRequestHead(version: HTTPVersion(major:1, minor:1), method: .GET, uri: "/sound?param[]=test&param[]=test2")
+        conn = Conn(reqHead: reqHead)
+
+        let paramArr = conn.queryParams["param"]!.value as! Array<Param>
+        XCTAssertTrue(paramArr[0] == "test")
+        XCTAssertTrue(paramArr[1] == "test2")
+
+        reqHead = HTTPRequestHead(version: HTTPVersion(major:1, minor:1), method: .GET, uri: "/sound?param[a]=test")
+        conn = Conn(reqHead: reqHead)
+
+        let paramDict = conn.queryParams["param"]!.value as! Dictionary<String, Param>
+        XCTAssert(paramDict["a"]! == "test")
     }
 
     func testHTMLEncoding() {
